@@ -1,6 +1,66 @@
-# Coduet - DevHelpProtocol
+# DevHelpProtocol (coduet)
 
-Um protocolo descentralizado para contratação de desenvolvedores na Solana, construído com Anchor Framework.
+DevHelpProtocol is a Solana smart contract built with the Anchor Framework, enabling developers to post help requests with hourly payment offers. Other developers can apply, the publisher can accept a helper, and funds are securely locked in a vault PDA. Upon completion, payment is automatically distributed, deducting platform fees. The contract also supports cancellation with specific rules, and is designed with robust security, PDA usage, validations, and abuse prevention.
+
+## Features
+- Post creation with value locked in a vault PDA
+- Helpers can apply to posts
+- Publishers can accept a helper (funds are locked)
+- Automatic payment and fee deduction upon contract completion
+- Secure cancellation logic
+- Full PDA and Anchor security patterns
+- Comprehensive validation and abuse prevention
+
+## Structure
+- **programs/coduet/src/lib.rs**: Main entry, program logic, and reexports
+- **programs/coduet/src/ix_accounts.rs**: All account structs for Anchor instructions (required for Anchor macro compatibility)
+- **programs/coduet/src/instructions/**: Handlers for each instruction (no account structs here)
+- **programs/coduet/src/state.rs**: State objects (Post, HelpRequest, Vault)
+- **programs/coduet/src/errors.rs**: Custom error types
+- **programs/coduet/src/utils.rs**: Utility functions
+- **tests/coduet.ts**: TypeScript tests using Anchor
+
+## Building & Testing
+
+1. **Install dependencies:**
+   ```sh
+   anchor install
+   yarn install
+   ```
+
+2. **Build the program:**
+   ```sh
+   anchor build
+   ```
+   If you see an error about `idl-build` feature, add this to your `Cargo.toml`:
+   ```toml
+   [features]
+   idl-build = ["anchor-lang/idl-build"]
+   ```
+
+3. **Run tests:**
+   ```sh
+   anchor test
+   ```
+
+## Usage
+
+- All account validation logic is in `ix_accounts.rs`.
+- Handlers in `instructions/` only import the relevant account struct from `ix_accounts`.
+- The Anchor macro expects all account structs to be reexported in `lib.rs`.
+
+## Security & Best Practices
+- All funds are locked in PDAs, never in user accounts
+- Strict validation on all instructions
+- Only publishers can accept helpers or cancel posts
+- Platform fees are deducted automatically
+- All state transitions are explicit and validated
+
+## Contributing
+Pull requests are welcome! Please ensure your code is well-tested and follows the Anchor and Solana best practices.
+
+## Licence
+MIT
 
 ## 🎯 Objetivo
 
