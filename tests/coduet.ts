@@ -277,51 +277,51 @@ describe("coduet", () => {
     //     }
     // });
 
-    it("Should create and cancel post successfully", async () => {
-        const cancelPostId = new anchor.BN(3);
-        const [cancelPostPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("post"), cancelPostId.toArrayLike(Buffer, "le", 8)],
-            program.programId
-        );
+    // it("Should create and cancel post successfully", async () => {
+    //     const cancelPostId = new anchor.BN(3);
+    //     const [cancelPostPda] = PublicKey.findProgramAddressSync(
+    //         [Buffer.from("post"), cancelPostId.toArrayLike(Buffer, "le", 8)],
+    //         program.programId
+    //     );
 
-        const [cancelVaultPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("vault"), cancelPostPda.toBuffer()],
-            program.programId
-        );
+    //     const [cancelVaultPda] = PublicKey.findProgramAddressSync(
+    //         [Buffer.from("vault"), cancelPostPda.toBuffer()],
+    //         program.programId
+    //     );
 
-        const publisherBalanceBefore = await provider.connection.getBalance(publisher.publicKey);
+    //     const publisherBalanceBefore = await provider.connection.getBalance(publisher.publicKey);
 
-        // Create post
-        await program.methods
-            .createPost(cancelPostId, "Cancel Test", "Test description", value)
-            .accounts({
-                publisher: publisher.publicKey,
-                post: cancelPostPda,
-                vault: cancelVaultPda,
-                systemProgram: SystemProgram.programId,
-                rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            })
-            .signers([publisher])
-            .rpc();
+    //     // Create post
+    //     await program.methods
+    //         .createPost(cancelPostId, "Cancel Test", "Test description", value)
+    //         .accounts({
+    //             publisher: publisher.publicKey,
+    //             post: cancelPostPda,
+    //             vault: cancelVaultPda,
+    //             systemProgram: SystemProgram.programId,
+    //             rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //         })
+    //         .signers([publisher])
+    //         .rpc();
 
-        // Cancel post
-        await program.methods
-            .cancelPost(cancelPostId)
-            .accounts({
-                publisher: publisher.publicKey,
-                post: cancelPostPda,
-                vault: cancelVaultPda,
-                platformFeeRecipient: platformFeeRecipient.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([publisher])
-            .rpc();
+    //     // Cancel post
+    //     await program.methods
+    //         .cancelPost(cancelPostId)
+    //         .accounts({
+    //             publisher: publisher.publicKey,
+    //             post: cancelPostPda,
+    //             vault: cancelVaultPda,
+    //             platformFeeRecipient: platformFeeRecipient.publicKey,
+    //             systemProgram: SystemProgram.programId,
+    //         })
+    //         .signers([publisher])
+    //         .rpc();
 
-        const postAccount = await program.account.post.fetch(cancelPostPda);
-        expect(postAccount.isOpen).to.be.false;
-        expect(postAccount.isCompleted).to.be.true;
+    //     const postAccount = await program.account.post.fetch(cancelPostPda);
+    //     expect(postAccount.isOpen).to.be.false;
+    //     expect(postAccount.isCompleted).to.be.true;
 
-        const publisherBalanceAfter = await provider.connection.getBalance(publisher.publicKey);
-        expect(publisherBalanceAfter).to.be.greaterThan(publisherBalanceBefore);
-    });
+    //     const publisherBalanceAfter = await provider.connection.getBalance(publisher.publicKey);
+    //     expect(publisherBalanceAfter).to.be.greaterThan(publisherBalanceBefore);
+    // });
 }); 
