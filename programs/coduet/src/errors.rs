@@ -55,4 +55,7 @@ pub enum CoduetError {
     
     #[msg("Arithmetic overflow")]
     ArithmeticOverflow,
+    
+    #[msg("Invalid value")]
+    InvalidValue,
 } 

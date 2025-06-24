@@ -11,7 +11,7 @@ pub fn create_post_handler(
     description: String,
     value: u64,
 ) -> Result<()> {
-    require!(value > 0, CoduetError::InsufficientFunds);
+    require!(value > 0, CoduetError::InvalidValue);
     require!(title.len() <= 100, CoduetError::InvalidTitleLength);
     require!(description.len() <= 500, CoduetError::InvalidDescriptionLength);
     
