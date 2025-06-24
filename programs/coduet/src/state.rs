@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::Result;
 use crate::errors::CoduetError;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
@@ -32,7 +33,7 @@ impl Post {
         8 + // value
         1 + // is_open
         8 + // platform_fee
-        1 + 32 + // accepted_helper (Option<Pubkey>)
+        4 + 32 + // accepted_helper (Option<Pubkey>)
         1 + // is_completed
         8 + // created_at
         8; // expires_at
