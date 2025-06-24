@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::state::*;
+use crate::state::{Post, Vault, HelpRequest};
 use crate::errors::*;
 use crate::utils::*;
 use crate::ix_accounts::CreatePost;

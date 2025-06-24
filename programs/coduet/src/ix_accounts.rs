@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-use crate::state::*;
 use crate::errors::*;
+use crate::state::{Post, Vault, HelpRequest};
 
 #[derive(Accounts)]
 #[instruction(post_id: u64, title: String, description: String, value: u64)]
