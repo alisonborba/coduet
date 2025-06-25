@@ -71,7 +71,7 @@ describe("coduet", () => {
         expect(postAccount.isCompleted).to.be.false;
         expect(postAccount.acceptedHelper).to.be.null;
 
-        // Checar saldo da vault (inclui rent-exempt minimum)
+        // Check vault balance (includes rent-exempt minimum)
         const vaultBalance = await provider.connection.getBalance(MAIN_VAULT.publicKey);
         expect(vaultBalance).to.equal(expectedVaultBalance);
     });
@@ -132,7 +132,6 @@ describe("coduet", () => {
         expect(postAccount.acceptedHelper.toString()).to.equal(helper.publicKey.toString());
 
         const helpRequestAccount = await program.account.helpRequest.fetch(helpRequestPda);
-        // expect(helpRequestAccount.status.accepted).to.be.true;
         expect(Object.keys(helpRequestAccount.status)[0]).to.equal("accepted");
     });
 
@@ -207,15 +206,13 @@ describe("coduet", () => {
 
         // Check payments
         expect(helperBalanceAfter).to.be.greaterThan(helperBalanceBefore);
-        // O platformFeeRecipient recebe apenas a platform_fee
+        // Platform fee recipient receives only the platform fee
         const FIXED_TX_FEE_LAMPORTS = 10_000; // 0.01 SOL
         const NUM_TXS_COVERED = 2;
         const totalFixedFee = FIXED_TX_FEE_LAMPORTS * NUM_TXS_COVERED;
         const platformFeeRaw = Math.floor(value.toNumber() * 5 / 100);
         const platformFee = Math.max(platformFeeRaw, 1000);
-        console.log('-------- Should complete contract successfully --------');
-        console.log('platformBalanceAfter / platformBalanceBefore / platformFee', platformBalanceAfter, platformBalanceBefore, platformFee);
-        expect(platformBalanceAfter - platformBalanceBefore).to.be.closeTo(platformFee, 5000);
+        expect(platformBalanceAfter - platformBalanceBefore).to.be.closeTo(platformFee, 5000); // 5k lamports tolerance
     });
 
     it("Should prevent creating post with invalid data", async () => {
@@ -351,9 +348,7 @@ describe("coduet", () => {
         expect(postAccount.isCompleted).to.be.true;
 
         const publisherBalanceAfter = await provider.connection.getBalance(publisher.publicKey);
-        console.log('Should create and cancel post successfully');
-        console.log('publisherBalanceBefore / publisherBalanceAfter', publisherBalanceBefore, publisherBalanceAfter);
-        // O saldo do publisher deve aumentar pelo menos o valor do post (com tolerância para taxas de transação)
-        expect(publisherBalanceBefore).to.be.greaterThan(publisherBalanceAfter); // tolerância de 0.00001 SOL 
+        // The publisher's balance should decrease due to transaction fees
+        expect(publisherBalanceBefore).to.be.greaterThan(publisherBalanceAfter);
     });
 }); 
