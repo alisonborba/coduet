@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::*;
 use crate::ix_accounts::CancelPost;
+use crate::utils::MAIN_VAULT_PUBKEY;
 
 pub fn cancel_post_handler(
     ctx: Context<CancelPost>,
@@ -25,15 +26,17 @@ pub fn cancel_post_handler(
     let platform_fee = ctx.accounts.post.platform_fee;
     let refund_amount = ctx.accounts.post.value;
     let total_refund = refund_amount + platform_fee;
+    // Validate main_vault
+    require!(ctx.accounts.main_vault.key().to_string() == MAIN_VAULT_PUBKEY, CoduetError::UnauthorizedPublisher);
     let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.vault.key(),
+        &ctx.accounts.main_vault.key(),
         &ctx.accounts.publisher.key(),
         total_refund,
     );
     anchor_lang::solana_program::program::invoke(
         &transfer_instruction,
         &[
-            ctx.accounts.vault.to_account_info(),
+            ctx.accounts.main_vault.to_account_info(),
             ctx.accounts.publisher.to_account_info(),
         ],
     )?;

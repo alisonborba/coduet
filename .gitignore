@@ -43,3 +43,4 @@ build/
 
 # Solana
 test-ledger/ 
+main_vault-keypair.json

@@ -62,102 +62,102 @@ Pull requests are welcome! Please ensure your code is well-tested and follows th
 ## Licence
 MIT
 
-## 🎯 Objetivo
+## 🎯 Objective
 
-O Coduet permite que desenvolvedores publiquem demandas de ajuda técnica e contratem outros desenvolvedores de forma segura e descentralizada. O protocolo garante que os pagamentos sejam feitos automaticamente após a conclusão do trabalho, com taxas transparentes para a plataforma.
+Coduet allows developers to publish technical help requests and hire other developers in a secure and decentralized way. The protocol ensures that payments are made automatically after the work is completed, with transparent platform fees.
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
-### Entidades Principais
+### Main Entities
 
-1. **Post**: Representa uma demanda de ajuda técnica
-   - ID único, publisher, título, descrição
-   - Valor total (value)
-   - Status (aberto/fechado, completado)
-   - Helper aceito
+1. **Post**: Represents a technical help request
+   - Unique ID, publisher, title, description
+   - Total value (value)
+   - Status (open/closed, completed)
+   - Accepted helper
 
-2. **HelpRequest**: Representa uma aplicação para um post
-   - Post ID, aplicante
-   - Status (pendente/aceito/rejeitado)
+2. **HelpRequest**: Represents an application for a post
+   - Post ID, applicant
+   - Status (pending/accepted/rejected)
 
-3. **Vault**: Conta PDA que mantém os fundos em escrow
-   - Autoridade: Post PDA
-   - Mantém fundos até finalização
+3. **Vault**: PDA account that holds funds in escrow
+   - Authority: Post PDA
+   - Holds funds until completion
 
-### Fluxo do Contrato
+### Contract Flow
 
-1. **Criação de Post**: Publisher deposita valor total + taxas
-2. **Aplicação**: Desenvolvedores se candidatam
-3. **Aceitação**: Publisher escolhe um helper
-4. **Finalização**: Pagamento automático + taxas
-5. **Cancelamento**: Reembolso (apenas se sem helper)
+1. **Post Creation**: Publisher deposits total value + fees
+2. **Application**: Developers apply
+3. **Acceptance**: Publisher chooses a helper
+4. **Completion**: Automatic payment + fees
+5. **Cancellation**: Refund (only if no helper)
 
-## 🔒 Segurança
+## 🔒 Security
 
-- ✅ PDAs para evitar colisões de contas
-- ✅ Validação de autorização (apenas publisher pode aceitar/finalizar)
-- ✅ Prevenção de double-spend e reentrância
-- ✅ Validação de valores mínimos
-- ✅ Safe math para evitar overflows
-- ✅ Expiração de posts (30 dias)
-- ✅ Bloqueio de posts após aceitação
+- ✅ PDAs to avoid account collisions
+- ✅ Authorization validation (only publisher can accept/complete)
+- ✅ Double-spend and reentrancy prevention
+- ✅ Minimum value validation
+- ✅ Safe math to avoid overflows
+- ✅ Post expiration (30 days)
+- ✅ Post lock after acceptance
 
-## 🚀 Instalação e Uso
+## 🚀 Installation & Usage
 
-### Pré-requisitos
+### Prerequisites
 
 - Rust 1.70+
 - Solana CLI 1.16+
 - Anchor CLI 0.29+
 - Node.js 16+
 
-### Instalação
+### Installation
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone <repository-url>
 cd coduet
 
-# Instale as dependências
+# Install dependencies
 npm install
 
-# Configure o Anchor
+# Configure Anchor
 anchor build
 ```
 
-### Configuração
+### Configuration
 
-1. Configure sua wallet no `~/.config/solana/id.json`
-2. Ajuste o cluster no `Anchor.toml` se necessário
-3. Configure o program ID no `lib.rs` se necessário
+1. Set up your wallet at `~/.config/solana/id.json`
+2. Adjust the cluster in `Anchor.toml` if needed
+3. Set the program ID in `lib.rs` if needed
 
-### Build e Deploy
+### Build and Deploy
 
 ```bash
-# Build do programa
+# Build the program
 anchor build
 
-# Deploy para localnet
+# Deploy to localnet
 anchor deploy
 
-# Deploy para devnet
+# Deploy to devnet
 anchor deploy --provider.cluster devnet
 ```
 
-### Testes
+### Tests
 
 ```bash
-# Executar todos os testes
+# Run all tests
 anchor test
 
-# Executar testes específicos
+# Run specific tests
 anchor test --skip-local-validator
 ```
 
-## 📋 Instruções Disponíveis
+## 📋 Available Instructions
 
 ### 1. create_post
-Cria um novo post com fundos em escrow.
+Creates a new post with funds in escrow.
 
 ```typescript
 await program.methods
@@ -174,7 +174,7 @@ await program.methods
 ```
 
 ### 2. apply_help
-Aplica para um post como helper.
+Apply to a post as a helper.
 
 ```typescript
 await program.methods
@@ -191,7 +191,7 @@ await program.methods
 ```
 
 ### 3. accept_helper
-Aceita um helper para o post.
+Accept a helper for the post.
 
 ```typescript
 await program.methods
@@ -207,7 +207,7 @@ await program.methods
 ```
 
 ### 4. complete_contract
-Finaliza o contrato e distribui pagamentos.
+Finalize the contract and distribute payments.
 
 ```typescript
 await program.methods
@@ -225,7 +225,7 @@ await program.methods
 ```
 
 ### 5. cancel_post
-Cancela um post (apenas se sem helper aceito).
+Cancel a post (only if no accepted helper).
 
 ```typescript
 await program.methods
@@ -241,37 +241,38 @@ await program.methods
   .rpc();
 ```
 
-## 💰 Taxas e Pagamentos
+## 💰 Fees and Payments
 
-- **Taxa da Plataforma**: 5% do valor total
-- **Taxa Mínima**: 0.001 SOL
-- **Taxa de Transação Estimada**: 0.005 SOL
-- **Expiração**: 30 dias após criação
+- **Platform Fee**: 5% of the total value
+- **Minimum Fee**: 0.001 SOL
+- **Fixed Transaction Fee**: 0.01 SOL x 2 transactions (editable in `programs/coduet/src/utils.rs` via `FIXED_TX_FEE_LAMPORTS` and `NUM_TXS_COVERED`)
+- **Fee Surplus**: Any value not consumed by transactions is transferred as profit to the main platform account after completion or cancellation of the post.
+- **Expiration**: 30 days after creation
 
-## 🧪 Testes
+## 🧪 Tests
 
-O projeto inclui testes abrangentes que cobrem:
+The project includes comprehensive tests covering:
 
-- ✅ Criação de posts
-- ✅ Aplicação para posts
-- ✅ Aceitação de helpers
-- ✅ Finalização de contratos
-- ✅ Cancelamento de posts
-- ✅ Validações de segurança
-- ✅ Prevenção de ataques
+- ✅ Post creation
+- ✅ Application to posts
+- ✅ Helper acceptance
+- ✅ Contract completion
+- ✅ Post cancellation
+- ✅ Security validations
+- ✅ Attack prevention
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 coduet/
 ├── programs/
 │   └── coduet/
 │       ├── src/
-│       │   ├── lib.rs              # Programa principal
-│       │   ├── errors.rs           # Erros personalizados
-│       │   ├── state.rs            # Estruturas de dados
-│       │   ├── utils.rs            # Utilitários
-│       │   └── instructions/       # Instruções do programa
+│       │   ├── lib.rs              # Main program
+│       │   ├── errors.rs           # Custom errors
+│       │   ├── state.rs            # Data structures
+│       │   ├── utils.rs            # Utilities
+│       │   └── instructions/       # Program instructions
 │       │       ├── mod.rs
 │       │       ├── create_post.rs
 │       │       ├── apply_help.rs
@@ -280,46 +281,58 @@ coduet/
 │       │       └── cancel_post.rs
 │       └── Cargo.toml
 ├── tests/
-│   └── coduet.ts                   # Testes em TypeScript
-├── Anchor.toml                     # Configuração do Anchor
+│   └── coduet.ts                   # TypeScript tests
+├── Anchor.toml                     # Anchor config
 ├── Cargo.toml                      # Workspace Cargo.toml
-├── package.json                    # Dependências Node.js
-└── README.md                       # Este arquivo
+├── package.json                    # Node.js dependencies
+└── README.md                       # This file
 ```
 
-## 🔧 Configuração Avançada
+## 🔧 Advanced Configuration
 
-### Variáveis de Ambiente
+### Environment Variables
 
 ```bash
-# Para desenvolvimento local
+# For local development
 ANCHOR_PROVIDER_URL=http://127.0.0.1:8899
 ANCHOR_WALLET=~/.config/solana/id.json
 
-# Para devnet
+# For devnet
 ANCHOR_PROVIDER_URL=https://api.devnet.solana.com
 ```
 
 ### Program ID
 
-O program ID padrão é `Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS`. Para usar um ID diferente:
+The default program ID is `Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS`. To use a different ID:
 
-1. Gere um novo program ID: `solana-keygen new -o target/deploy/coduet-keypair.json`
-2. Atualize o `declare_id!()` no `lib.rs`
-3. Atualize o `Anchor.toml`
+1. Generate a new program ID: `solana-keygen new -o target/deploy/coduet-keypair.json`
+2. Update `declare_id!()` in `lib.rs`
+3. Update `Anchor.toml`
 
-## 🤝 Contribuição
+## 🤝 Contribution
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está licenciado sob a MIT License.
+This project is licensed under the MIT License.
 
 ## ⚠️ Disclaimer
 
-Este é um projeto educacional. Use em produção por sua conta e risco. Sempre faça auditorias de segurança antes de usar em produção. 
+This is an educational project. Use in production at your own risk. Always perform security audits before using in production.
+
+## 💰 Global Main Account (main_vault)
+
+- All post values, fees, and payments go through a global main account, controlled externally (can be imported into Phantom).
+- Public address of the main_vault: `4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2`
+- Private key (array to import into Phantom):
+
+```
+[239,44,167,206,187,124,65,17,170,91,132,162,81,22,25,237,136,37,132,232,180,13,150,118,13,223,50,244,80,160,18,227,58,142,211,57,13,54,118,35,191,161,245,245,0,229,54,169,207,67,238,92,172,11,224,73,45,132,91,203,246,63,150,163]
+```
+
+- To import into Phantom, use the import by private key option and paste the array above. 

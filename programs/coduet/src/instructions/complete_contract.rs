@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::*;
 use crate::ix_accounts::CompleteContract;
+use crate::utils::MAIN_VAULT_PUBKEY;
 
 pub fn complete_contract_handler(
     ctx: Context<CompleteContract>,
@@ -21,27 +22,28 @@ pub fn complete_contract_handler(
     let helper_pubkey = ctx.accounts.post.accepted_helper.unwrap();
     let platform_fee = ctx.accounts.post.platform_fee;
     let helper_amount = ctx.accounts.post.value - platform_fee;
+    require!(ctx.accounts.main_vault.key().to_string() == MAIN_VAULT_PUBKEY, CoduetError::UnauthorizedPublisher);
     let transfer_helper_instruction = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.vault.key(),
+        &ctx.accounts.main_vault.key(),
         &helper_pubkey,
         helper_amount,
     );
     anchor_lang::solana_program::program::invoke(
         &transfer_helper_instruction,
         &[
-            ctx.accounts.vault.to_account_info(),
+            ctx.accounts.main_vault.to_account_info(),
             ctx.accounts.helper.to_account_info(),
         ],
     )?;
     let transfer_platform_fee_instruction = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.vault.key(),
+        &ctx.accounts.main_vault.key(),
         &ctx.accounts.platform_fee_recipient.key(),
         platform_fee,
     );
     anchor_lang::solana_program::program::invoke(
         &transfer_platform_fee_instruction,
         &[
-            ctx.accounts.vault.to_account_info(),
+            ctx.accounts.main_vault.to_account_info(),
             ctx.accounts.platform_fee_recipient.to_account_info(),
         ],
     )?;
