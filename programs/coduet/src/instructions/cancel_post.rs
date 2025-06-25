@@ -26,7 +26,7 @@ pub fn cancel_post_handler(
     let platform_fee = ctx.accounts.post.platform_fee;
     let refund_amount = ctx.accounts.post.value;
     let total_refund = refund_amount + platform_fee;
-    // Validar main_vault
+    // Validate main_vault
     require!(ctx.accounts.main_vault.key().to_string() == MAIN_VAULT_PUBKEY, CoduetError::UnauthorizedPublisher);
     let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
         &ctx.accounts.main_vault.key(),

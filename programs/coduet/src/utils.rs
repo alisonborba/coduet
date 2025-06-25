@@ -3,8 +3,8 @@ use crate::errors::CoduetError;
 
 pub const PLATFORM_FEE_PERCENTAGE: u64 = 5; // 5%
 pub const MIN_PLATFORM_FEE: u64 = 1000; // 0.001 SOL in lamports
-pub const FIXED_TX_FEE_LAMPORTS: u64 = 10_000; // 0.01 SOL por transação (ajuste aqui)
-pub const NUM_TXS_COVERED: u64 = 2; // Quantas transações o publisher cobre antecipadamente
+pub const FIXED_TX_FEE_LAMPORTS: u64 = 10_000; // 0.01 SOL per transaction (adjust here)
+pub const NUM_TXS_COVERED: u64 = 2; // Number of transactions the publisher covers in advance
 pub const MAIN_VAULT_PUBKEY: &str = "4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2";
 
 pub fn calculate_platform_fee(value: u64) -> Result<u64> {
