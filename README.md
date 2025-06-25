@@ -245,7 +245,8 @@ await program.methods
 
 - **Taxa da Plataforma**: 5% do valor total
 - **Taxa Mínima**: 0.001 SOL
-- **Taxa de Transação Estimada**: 0.005 SOL
+- **Taxa de Transação Fixa**: 0.01 SOL x 2 transações (editável em `programs/coduet/src/utils.rs` via `FIXED_TX_FEE_LAMPORTS` e `NUM_TXS_COVERED`)
+- **Excedente de Taxa**: Qualquer valor não consumido pelas transações é transferido como lucro para a conta principal da plataforma após a conclusão ou cancelamento do post.
 - **Expiração**: 30 dias após criação
 
 ## 🧪 Testes
@@ -322,4 +323,16 @@ Este projeto está licenciado sob a MIT License.
 
 ## ⚠️ Disclaimer
 
-Este é um projeto educacional. Use em produção por sua conta e risco. Sempre faça auditorias de segurança antes de usar em produção. 
+Este é um projeto educacional. Use em produção por sua conta e risco. Sempre faça auditorias de segurança antes de usar em produção.
+
+## 💰 Conta Principal Global (main_vault)
+
+- Todos os valores de posts, taxas e pagamentos passam por uma conta principal global, controlada externamente (pode ser importada na Phantom).
+- Endereço público da main_vault: `4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2`
+- Chave privada (array para importar na Phantom):
+
+```
+[239,44,167,206,187,124,65,17,170,91,132,162,81,22,25,237,136,37,132,232,180,13,150,118,13,223,50,244,80,160,18,227,58,142,211,57,13,54,118,35,191,161,245,245,0,229,54,169,207,67,238,92,172,11,224,73,45,132,91,203,246,63,150,163]
+```
+
+- Para importar na Phantom, use a opção de importar por chave privada e cole o array acima. 

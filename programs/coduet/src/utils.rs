@@ -3,7 +3,9 @@ use crate::errors::CoduetError;
 
 pub const PLATFORM_FEE_PERCENTAGE: u64 = 5; // 5%
 pub const MIN_PLATFORM_FEE: u64 = 1000; // 0.001 SOL in lamports
-pub const ESTIMATED_TX_FEE: u64 = 5000; // 0.005 SOL in lamports
+pub const FIXED_TX_FEE_LAMPORTS: u64 = 10_000; // 0.01 SOL por transação (ajuste aqui)
+pub const NUM_TXS_COVERED: u64 = 2; // Quantas transações o publisher cobre antecipadamente
+pub const MAIN_VAULT_PUBKEY: &str = "4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2";
 
 pub fn calculate_platform_fee(value: u64) -> Result<u64> {
     let fee = value
@@ -19,7 +21,7 @@ pub fn calculate_total_required_funds(value: u64) -> Result<u64> {
     let total = value
         .checked_add(platform_fee)
         .ok_or(CoduetError::ArithmeticOverflow)?
-        .checked_add(ESTIMATED_TX_FEE)
+        .checked_add(FIXED_TX_FEE_LAMPORTS.checked_mul(NUM_TXS_COVERED).ok_or(CoduetError::ArithmeticOverflow)?)
         .ok_or(CoduetError::ArithmeticOverflow)?;
     Ok(total)
 }

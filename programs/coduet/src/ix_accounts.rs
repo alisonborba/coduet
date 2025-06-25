@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::errors::*;
-use crate::state::{Post, Vault, HelpRequest};
+use crate::state::{Post, HelpRequest};
 
 #[derive(Accounts)]
 #[instruction(post_id: u64, title: String, description: String, value: u64)]
@@ -15,14 +15,9 @@ pub struct CreatePost<'info> {
         bump
     )]
     pub post: Account<'info, Post>,
-    #[account(
-        init,
-        payer = publisher,
-        space = Vault::LEN,
-        seeds = [b"vault", post.key().as_ref()],
-        bump
-    )]
-    pub vault: Account<'info, Vault>,
+    /// CHECK: main_vault is an externally owned system account (not a PDA), validated by pubkey in handler.
+    #[account(mut)]
+    pub main_vault: AccountInfo<'info>,
     /// CHECK: This is the system program
     pub system_program: Program<'info, System>,
     /// CHECK: This is the rent sysvar
@@ -41,6 +36,9 @@ pub struct ApplyHelp<'info> {
         constraint = post.publisher != applicant.key() @ CoduetError::UnauthorizedPublisher
     )]
     pub post: Account<'info, Post>,
+    /// CHECK: main_vault is an externally owned system account (not a PDA), validated by pubkey in handler.
+    #[account(mut)]
+    pub main_vault: AccountInfo<'info>,
     #[account(
         init,
         payer = applicant,
@@ -79,6 +77,9 @@ pub struct AcceptHelper<'info> {
     pub help_request: Account<'info, HelpRequest>,
     /// CHECK: applicant wallet
     pub applicant: UncheckedAccount<'info>,
+    /// CHECK: main_vault is an externally owned system account (not a PDA), validated by pubkey in handler.
+    #[account(mut)]
+    pub main_vault: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -86,6 +87,8 @@ pub struct AcceptHelper<'info> {
 pub struct CompleteContract<'info> {
     #[account(mut)]
     pub publisher: Signer<'info>,
+    #[account(mut, signer)]
+    pub main_vault: Signer<'info>,
     #[account(
         mut,
         seeds = [b"post", post_id.to_le_bytes().as_ref()],
@@ -95,13 +98,6 @@ pub struct CompleteContract<'info> {
         constraint = post.accepted_helper.is_some() @ CoduetError::PostNotFound
     )]
     pub post: Account<'info, Post>,
-    #[account(
-        mut,
-        seeds = [b"vault", post.key().as_ref()],
-        bump,
-        constraint = vault.authority == post.key()
-    )]
-    pub vault: Account<'info, Vault>,
     /// CHECK: This is the helper's account
     #[account(mut)]
     pub helper: AccountInfo<'info>,
@@ -117,6 +113,8 @@ pub struct CompleteContract<'info> {
 pub struct CancelPost<'info> {
     #[account(mut)]
     pub publisher: Signer<'info>,
+    #[account(mut, signer)]
+    pub main_vault: Signer<'info>,
     #[account(
         mut,
         seeds = [b"post", post_id.to_le_bytes().as_ref()],
@@ -127,13 +125,6 @@ pub struct CancelPost<'info> {
         constraint = post.accepted_helper.is_none() @ CoduetError::CannotCancelWithHelper
     )]
     pub post: Account<'info, Post>,
-    #[account(
-        mut,
-        seeds = [b"vault", post.key().as_ref()],
-        bump,
-        constraint = vault.authority == post.key()
-    )]
-    pub vault: Account<'info, Vault>,
     /// CHECK: This is the platform fee recipient
     #[account(mut)]
     pub platform_fee_recipient: AccountInfo<'info>,
