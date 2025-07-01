@@ -11,7 +11,7 @@ pub mod instructions;
 // Reexport structs for Anchor macro
 pub use ix_accounts::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("G5gcEvNxXPxsUwKmGNxNheKq2j5nBghciJpCyooPCKdd");
 
 #[program]
 pub mod coduet {
@@ -21,25 +21,9 @@ pub mod coduet {
         ctx: Context<CreatePost>,
         post_id: u64,
         title: String,
-        description: String,
         value: u64,
     ) -> Result<()> {
-        instructions::create_post::create_post_handler(ctx, post_id, title, description, value)
-    }
-
-    pub fn apply_help(
-        ctx: Context<ApplyHelp>,
-        post_id: u64,
-    ) -> Result<()> {
-        instructions::apply_help::apply_help_handler(ctx, post_id)
-    }
-
-    pub fn accept_helper(
-        ctx: Context<AcceptHelper>,
-        post_id: u64,
-        applicant: Pubkey,
-    ) -> Result<()> {
-        instructions::accept_helper::accept_helper_handler(ctx, post_id, applicant)
+        instructions::create_post::create_post_handler(ctx, post_id, title, value)
     }
 
     pub fn complete_contract(

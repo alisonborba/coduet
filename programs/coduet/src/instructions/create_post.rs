@@ -9,13 +9,10 @@ pub fn create_post_handler(
     ctx: Context<CreatePost>,
     post_id: u64,
     title: String,
-    description: String,
     value: u64,
 ) -> Result<()> {
     require!(value > 0, CoduetError::InvalidValue);
     require!(title.len() <= 100, CoduetError::InvalidTitleLength);
-    require!(description.len() <= 500, CoduetError::InvalidDescriptionLength);
-    
     let platform_fee = calculate_platform_fee(value)?;
     let total_required = calculate_total_required_funds(value)?;
     require!(
@@ -28,7 +25,6 @@ pub fn create_post_handler(
         post_id,
         ctx.accounts.publisher.key(),
         title,
-        description,
         value,
         platform_fee,
         current_time,
