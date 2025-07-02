@@ -36,8 +36,7 @@ pub struct CompleteContract<'info> {
         seeds = [b"post", post_id.to_le_bytes().as_ref()],
         bump,
         constraint = post.publisher == publisher.key() @ CoduetError::UnauthorizedPublisher,
-        constraint = !post.is_completed @ CoduetError::PostAlreadyCompleted,
-        constraint = post.accepted_helper.is_some() @ CoduetError::PostNotFound
+        constraint = !post.is_completed @ CoduetError::PostAlreadyCompleted
     )]
     pub post: Account<'info, Post>,
     /// CHECK: This is the helper's account

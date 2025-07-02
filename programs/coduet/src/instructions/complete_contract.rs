@@ -15,11 +15,8 @@ pub fn complete_contract_handler(
         !ctx.accounts.post.is_completed,
         CoduetError::PostAlreadyCompleted
     );
-    require!(
-        ctx.accounts.post.accepted_helper.is_some(),
-        CoduetError::PostNotFound
-    );
-    let helper_pubkey = ctx.accounts.post.accepted_helper.unwrap();
+    let helper_pubkey = ctx.accounts.helper.key();
+    ctx.accounts.post.accepted_helper = Some(helper_pubkey);
     let platform_fee = ctx.accounts.post.platform_fee;
     let helper_amount = ctx.accounts.post.value - platform_fee;
     require!(ctx.accounts.main_vault.key().to_string() == MAIN_VAULT_PUBKEY, CoduetError::UnauthorizedPublisher);

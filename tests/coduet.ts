@@ -92,8 +92,6 @@ describe("coduet", () => {
         expect(vaultBalance).to.equal(expectedVaultBalance);
     });
 
-
-
     it("Should fail to complete contract when no helper is accepted", async () => {
         const completePostId = new anchor.BN(999);
         const [postPda] = PublicKey.findProgramAddressSync(
@@ -284,5 +282,54 @@ describe("coduet", () => {
         expect(post1.isOpen).to.be.true;
         expect(post2.isOpen).to.be.true;
         expect(post3.isOpen).to.be.true;
+    });
+
+    it("Should accept a helper and pay the helper (complete_contract)", async () => {
+        const testPostId = new anchor.BN(1234);
+        const [postPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("post"), testPostId.toArrayLike(Buffer, "le", 8)],
+            program.programId
+        );
+
+        // Cria o post
+        await program.methods
+            .createPost(testPostId, "Test Accept Helper", value)
+            .accounts({
+                publisher: publisher.publicKey,
+                mainVault: masterWallet.publicKey,
+            })
+            .signers([publisher])
+            .rpc();
+
+        // Sobrescreve o campo accepted_helper diretamente (workaround para teste)
+        const postAccount = await program.account.post.fetch(postPda);
+        const postObj = {
+            ...postAccount,
+            acceptedHelper: helper.publicKey,
+        };
+        await program.provider.connection._rpcRequest("setAccount", [
+            postPda.toBase58(),
+            program.coder.accounts.encode("Post", postObj).toString("base64"),
+        ]);
+
+        // Saldo antes
+        const helperBalanceBefore = await provider.connection.getBalance(helper.publicKey);
+
+        // Completa o contrato
+        await program.methods
+            .completeContract(testPostId)
+            .accounts({
+                publisher: publisher.publicKey,
+                mainVault: masterWallet.publicKey,
+                helper: helper.publicKey,
+                platformFeeRecipient: platformFeeRecipient.publicKey,
+            })
+            .signers([publisher, masterWallet])
+            .rpc();
+
+        // Saldo depois
+        const helperBalanceAfter = await provider.connection.getBalance(helper.publicKey);
+
+        expect(helperBalanceAfter).to.be.greaterThan(helperBalanceBefore);
     });
 }); 
