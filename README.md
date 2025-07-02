@@ -1,147 +1,156 @@
 # DevHelpProtocol (coduet)
 
-DevHelpProtocol é um contrato inteligente Solana construído com Anchor, permitindo que desenvolvedores publiquem pedidos de ajuda técnica com ofertas de pagamento por hora. Os fundos são bloqueados em uma vault PDA. Ao completar, o pagamento é distribuído automaticamente, deduzindo taxas da plataforma. O contrato também suporta cancelamento com regras específicas, e é projetado com segurança robusta, uso de PDA, validações e prevenção de abuso.
+DevHelpProtocol is a Solana smart contract built with Anchor, allowing developers to publish technical help requests with payment offers. Funds are locked in a vault PDA. Upon completion, payment is automatically distributed, deducting platform fees. The contract also supports cancellation with specific rules and is designed with robust security, PDA usage, validations, and abuse prevention.
+
+## 🌐 Frontend
+
+- Repository: [coduet-app (GitHub)](https://github.com/alisonborba/coduet-app)
+- Live app: [https://coduet.vercel.app/](https://coduet.vercel.app/)
 
 ## Features
-- Criação de post com valor bloqueado em vault PDA
-- Pagamento automático e dedução de taxas na conclusão
-- Lógica de cancelamento segura (reembolsa apenas o valor do post, taxas ficam na main vault)
-- Padrões de segurança Anchor e Solana
-- Validação e prevenção de abuso
+- Post creation with value locked in a vault PDA
+- Automatic payment and fee deduction upon completion
+- Secure cancellation logic (refunds only the post value, fees remain in the main vault)
+- Anchor and Solana security standards
+- Validation and abuse prevention
+- **Enhanced validations**: Title limited to 100 characters, required minimum value, automatic calculation of fees and required funds
+- **Automatic expiration**: Posts expire 30 days after creation
+- **Decoupled handlers**: All instruction logic is in separate files under `instructions/` for maintainability
+- **Centralized constants**: Fees, minimum values, and business parameters are defined in `utils.rs`
 
 ## Structure
-- **programs/coduet/src/lib.rs**: Entrada principal, lógica do programa e reexports
-- **programs/coduet/src/ix_accounts.rs**: Structs de contas para instruções Anchor
-- **programs/coduet/src/instructions/**: Handlers de cada instrução
-- **programs/coduet/src/state.rs**: Objetos de estado (Post, Vault)
-- **programs/coduet/src/errors.rs**: Tipos de erro customizados
-- **programs/coduet/src/utils.rs**: Funções utilitárias
-- **tests/coduet.ts**: Testes TypeScript usando Anchor
+- **programs/coduet/src/lib.rs**: Main entry point, program logic, and reexports
+- **programs/coduet/src/ix_accounts.rs**: Account structs and validations for Anchor instructions (includes detailed constraints)
+- **programs/coduet/src/instructions/**: Handlers for each instruction (logic separated by operation)
+- **programs/coduet/src/state.rs**: State objects (Post, Vault) with utility methods (expiration, permissions)
+- **programs/coduet/src/errors.rs**: Custom error types
+- **programs/coduet/src/utils.rs**: Utility functions and business constants
+- **tests/coduet.ts**: TypeScript tests using Anchor
 
 ## Building & Testing
 
-1. **Instale as dependências:**
+1. **Install dependencies:**
    ```sh
    anchor install
    yarn install
    ```
 
-2. **Compile o programa:**
+2. **Build the program:**
    ```sh
    anchor build
    ```
 
-3. **Rode os testes:**
+3. **Run the tests:**
    ```sh
    anchor test
    ```
 
 ## Usage
 
-- Toda lógica de validação de contas está em `ix_accounts.rs`.
-- Handlers em `instructions/` importam apenas o struct relevante.
-- O macro Anchor espera todos os structs reexportados em `lib.rs`.
+- All account validation logic is in `ix_accounts.rs`.
+- Handlers in `instructions/` import only the relevant struct.
+- The Anchor macro expects all structs to be reexported in `lib.rs`.
 
 ## Security & Best Practices
-- Todos os fundos são bloqueados em PDAs, nunca em contas de usuário
-- Validação estrita em todas as instruções
-- Apenas o publisher pode cancelar posts
-- Taxas da plataforma deduzidas automaticamente
-- Todas as transições de estado são explícitas e validadas
+- All funds are locked in PDAs, never in user accounts
+- Strict validation in all instructions
+- Only the publisher can cancel posts
+- Platform fees are automatically deducted
+- All state transitions are explicit and validated
 
 ## Contributing
-Pull requests são bem-vindos! Garanta que seu código está bem testado e segue as melhores práticas Anchor/Solana.
+Pull requests are welcome! Make sure your code is well tested and follows Anchor/Solana best practices.
 
-## Licence
+## License
 MIT
 
-## 🎯 Objetivo
+## 🎯 Purpose
 
-Coduet permite que desenvolvedores publiquem pedidos de ajuda técnica e contratem outros devs de forma segura e descentralizada. O protocolo garante pagamentos automáticos após a conclusão, com taxas transparentes.
+Coduet allows developers to publish technical help requests and hire other devs in a secure and decentralized way. The protocol guarantees automatic payments after completion, with transparent fees.
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
-### Entidades principais
+### Main Entities
 
-1. **Post**: Representa um pedido de ajuda técnica
-   - ID único, publisher, título
-   - Valor total (value)
-   - Status (aberto/fechado, concluído)
-   - Helper aceito
+1. **Post**: Represents a technical help request
+   - Unique ID, publisher, title
+   - Total value
+   - Status (open/closed, completed)
+   - Accepted helper
 
-2. **Vault**: Conta PDA que mantém fundos em escrow
-   - Autoridade: Post PDA
-   - Mantém fundos até a conclusão
+2. **Vault**: PDA account that holds funds in escrow
+   - Authority: Post PDA
+   - Holds funds until completion
 
-### Fluxo do contrato
+### Contract Flow
 
-1. **Criação do Post**: Publisher deposita valor total + taxas
-2. **Conclusão**: Pagamento automático + taxas
-3. **Cancelamento**: Reembolso apenas do valor do post (taxas ficam na main vault)
+1. **Post Creation**: Publisher deposits total value + fees
+2. **Completion**: Automatic payment + fees
+3. **Cancellation**: Refunds only the post value (fees remain in the main vault)
 
-## 🔒 Segurança
+## 🔒 Security
 
-- ✅ PDAs para evitar colisão de contas
-- ✅ Validação de autorização (só publisher pode concluir/cancelar)
-- ✅ Prevenção de double-spend e reentrância
-- ✅ Validação de valor mínimo
-- ✅ Safe math para evitar overflows
-- ✅ Expiração do post (30 dias)
-- ✅ Lock do post após aceitação
+- ✅ PDAs to avoid account collisions
+- ✅ Authorization validation (only publisher can complete/cancel)
+- ✅ Double-spend and reentrancy prevention
+- ✅ Minimum value validation
+- ✅ Safe math to avoid overflows
+- ✅ Post expiration (30 days)
+- ✅ Post lock after acceptance
 
-## 🚀 Instalação & Uso
+## 🚀 Installation & Usage
 
-### Pré-requisitos
+### Prerequisites
 
 - Rust 1.70+
 - Solana CLI 1.16+
 - Anchor CLI 0.29+
 - Node.js 16+
 
-### Instalação
+### Installation
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone <repository-url>
 cd coduet
 
-# Instale as dependências
+# Install dependencies
 npm install
 
-# Configure o Anchor
+# Configure Anchor
 anchor build
 ```
 
-### Configuração
+### Configuration
 
-1. Configure sua wallet em `~/.config/solana/id.json`
-2. Ajuste o cluster em `Anchor.toml` se necessário
-3. Atualize o program ID em `lib.rs` se necessário
+1. Set up your wallet at `~/.config/solana/id.json`
+2. Adjust the cluster in `Anchor.toml` if needed
+3. Update the program ID in `lib.rs` if needed
 
-### Build e Deploy
+### Build and Deploy
 
 ```bash
-# Compile o programa
+# Build the program
 anchor build
 
-# Deploy localnet
+# Deploy to localnet
 anchor deploy
 
-# Deploy devnet
+# Deploy to devnet
 anchor deploy --provider.cluster devnet
 ```
 
-### Testes
+### Tests
 
 ```bash
-# Rode todos os testes
+# Run all tests
 anchor test
 ```
 
-## 📋 Instruções Disponíveis
+## 📋 Available Instructions
 
 ### 1. create_post
-Cria um novo post com fundos em escrow.
+Creates a new post with funds in escrow. Validates title, value, publisher balance, and main_vault.
 
 ```typescript
 await program.methods
@@ -155,7 +164,7 @@ await program.methods
 ```
 
 ### 2. complete_contract
-Finaliza o contrato e distribui pagamentos.
+Completes the contract and distributes payments. Only the publisher can call, and only if the post is not completed.
 
 ```typescript
 await program.methods
@@ -171,7 +180,7 @@ await program.methods
 ```
 
 ### 3. cancel_post
-Cancela um post (só se não houver helper aceito). Reembolsa apenas o valor do post, taxas permanecem na main vault.
+Cancels a post (only if no helper is accepted, and only if open). Refunds only the post value, fees remain in the main vault.
 
 ```typescript
 await program.methods
@@ -185,94 +194,86 @@ await program.methods
   .rpc();
 ```
 
-## 💰 Taxas e Pagamentos
+## 💰 Fees and Payments
 
-- **Taxa da Plataforma**: 5% do valor total
-- **Taxa Mínima**: 0.001 SOL
-- **Taxa Fixa de Transação**: 0.01 SOL x 2 transações (editável em `programs/coduet/src/utils.rs` via `FIXED_TX_FEE_LAMPORTS` e `NUM_TXS_COVERED`)
-- **Fee Surplus**: Qualquer valor não consumido por transações é transferido como lucro para a conta principal da plataforma após conclusão ou cancelamento do post.
-- **Expiração**: 30 dias após a criação
+- **Platform Fee**: 5% of the total value (minimum 0.001 SOL, defined in `utils.rs`)
+- **Fixed Transaction Fee**: 0.01 SOL x 2 transactions (editable in `FIXED_TX_FEE_LAMPORTS` and `NUM_TXS_COVERED` in `utils.rs`)
+- **Fee Surplus**: Any value not consumed by transactions remains in the main vault after completion/cancellation
+- **Expiration**: 30 days after creation (automatic via method in `Post`)
 
-## 🧪 Testes
+## 🧪 Tests
 
-O projeto inclui testes cobrindo:
+The project includes tests covering:
 
-- ✅ Criação de post
-- ✅ Conclusão de contrato
-- ✅ Cancelamento de post
-- ✅ Validações de segurança
-- ✅ Prevenção de ataques
+- ✅ Post creation
+- ✅ Contract completion
+- ✅ Post cancellation
+- ✅ Security validations
+- ✅ Attack prevention
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 coduet/
 ├── programs/
 │   └── coduet/
 │       ├── src/
-│       │   ├── lib.rs              # Programa principal
-│       │   ├── errors.rs           # Erros customizados
-│       │   ├── state.rs            # Estruturas de dados
-│       │   ├── utils.rs            # Utilidades
-│       │   └── instructions/       # Instruções do programa
+│       │   ├── lib.rs              # Main program
+│       │   ├── errors.rs           # Custom errors
+│       │   ├── state.rs            # Data structures
+│       │   ├── utils.rs            # Utilities
+│       │   └── instructions/       # Program instructions
 │       │       ├── mod.rs
 │       │       ├── create_post.rs
 │       │       ├── complete_contract.rs
 │       │       └── cancel_post.rs
 │       └── Cargo.toml
 ├── tests/
-│   └── coduet.ts                   # Testes TypeScript
-├── Anchor.toml                     # Config Anchor
+│   └── coduet.ts                   # TypeScript tests
+├── Anchor.toml                     # Anchor config
 ├── Cargo.toml                      # Workspace Cargo.toml
-├── package.json                    # Dependências Node.js
-└── README.md                       # Este arquivo
+├── package.json                    # Node.js dependencies
+└── README.md                       # This file
 ```
 
-## 🔧 Configuração Avançada
+## 🔧 Advanced Configuration
 
-### Variáveis de Ambiente
+### Environment Variables
 
 ```bash
-# Para desenvolvimento local
+# For local development
 ANCHOR_PROVIDER_URL=http://127.0.0.1:8899
 ANCHOR_WALLET=~/.config/solana/id.json
 
-# Para devnet
+# For devnet
 ANCHOR_PROVIDER_URL=https://api.devnet.solana.com
 ```
 
 ### Program ID
 
-O program ID padrão é `G5gcEvNxXPxsUwKmGNxNheKq2j5nBghciJpCyooPCKdd`. Para usar outro ID:
+The default program ID is `G5gcEvNxXPxsUwKmGNxNheKq2j5nBghciJpCyooPCKdd`. To use another ID:
 
-1. Gere um novo program ID: `solana-keygen new -o target/deploy/coduet-keypair.json`
-2. Atualize `declare_id!()` em `lib.rs`
-3. Atualize `Anchor.toml`
+1. Generate a new program ID: `solana-keygen new -o target/deploy/coduet-keypair.json`
+2. Update `declare_id!()` in `lib.rs`
+3. Update `Anchor.toml`
 
-## 🤝 Contribuição
+## 🤝 Contributing
 
-1. Fork o projeto
-2. Crie um branch para sua feature
-3. Commit suas mudanças
-4. Push para o branch
-5. Abra um Pull Request
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-## 📄 Licença
+## 📄 License
 
 MIT
 
 ## ⚠️ Disclaimer
 
-Este é um projeto educacional. Use em produção por sua conta e risco. Sempre faça auditorias de segurança antes de usar em produção.
+This is an educational project. Use in production at your own risk. Always perform security audits before using in production.
 
-## 💰 Conta Principal Global (main_vault)
+## 💰 Global Main Account (main_vault)
 
-- Todos os valores, taxas e pagamentos passam por uma conta principal global, controlada externamente (pode ser importada no Phantom).
-- Endereço público da main_vault: `4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2`
-- Chave privada (array para importar no Phantom):
-
-```
-[239,44,167,206,187,124,65,17,170,91,132,162,81,22,25,237,136,37,132,232,180,13,150,118,13,223,50,244,80,160,18,227,58,142,211,57,13,54,118,35,191,161,245,245,0,229,54,169,207,67,238,92,172,11,224,73,45,132,91,203,246,63,150,163]
-```
-
-- Para importar no Phantom, use a opção de importar por chave privada e cole o array acima.
+- All values, fees, and payments go through a global main account, controlled externally (can be imported into Phantom).
+- Public address of the main_vault: `4waxnAptoSYbKEeFtx8Qo7tauC9yhfCL6z2eT7MK4Vr2`
