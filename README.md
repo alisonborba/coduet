@@ -1,6 +1,6 @@
-# DevHelpProtocol (coduet)
+# Coduet
 
-DevHelpProtocol is a Solana smart contract built with Anchor, allowing developers to publish technical help requests with payment offers. Funds are locked in a vault PDA. Upon completion, payment is automatically distributed, deducting platform fees. The contract also supports cancellation with specific rules and is designed with robust security, PDA usage, validations, and abuse prevention.
+Coduet is a Solana smart contract built with Anchor, allowing developers to publish technical help requests with payment offers. Funds are locked in a vault PDA. Upon completion, payment is automatically distributed, deducting platform fees. The contract also supports cancellation with specific rules and is designed with robust security, PDA usage, validations, and abuse prevention.
 
 ## 🌐 Frontend
 
